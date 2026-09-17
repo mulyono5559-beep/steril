@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Sterilisasi MOEL</title>
+    <!-- Memuat Signature Pad Library dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <style>
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Header Info (Jam & Tanggal) */
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2f3640;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Navigasi Antar Dashboard */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #dfe6e9;
+            padding-bottom: 15px;
+        }
+
+        .nav-btn {
+            background-color: #b2bec3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .nav-btn.active {
+            background-color: #2d3436;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h1.title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .moel-blink {
+            color: #ff4757;
+            animation: blink 1s infinite;
+            font-weight: bold;
+        }
+
+        fieldset {
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+
+        legend {
+            font-weight: bold;
+            color: #2f3640;
+            padding: 0 5px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            width: 160px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ced6e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .petugas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .alat-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group input {
+            margin-right: 8px;
+        }
+
+        .time-btn {
+            background-color: #718093;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
+        .time-btn:hover {
+            background-color: #2f3640;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .signature-box {
+            width: 45%;
+        }
+
+        .signature-box p {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .canvas-wrapper {
+            border: 1px dashed #718093;
+            background-color: #fff;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 150px;
+            touch-action: none;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-main {
+            background-color: #2ed573;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-main:hover {
+            background-color: #26af5f;
+        }
+
+        .btn-submit {
+            background-color: #e67e22;
+        }
+        .btn-submit:hover {
+            background-color: #d35400;
+        }
+
+        /* Styling Dashboard Admin */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 8px 12px;
+            width: 250px;
+            border: 1px solid #ced6e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        table.rekap-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        table.rekap-table th, 
+        table.rekap-table td {
+            border: 1px solid #dfe6e9;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        table.rekap-table th {
+            background-color: #2f3640;
+            color: white;
+        }
+
+        table.rekap-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-view { background-color: #e1b12c; color: white; }
+        .btn-delete { background-color: #eb4d4b; color: white; }
+
+        /* Pengaturan Cetak / Print PDF */
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+            }
+            .nav-tabs, .action-buttons, .time-btn, .clear-btn, .search-box, .no-print, .header-info {
+                display: none !important;
+            }
+            input, textarea {
+                border: none !important;
+                border-bottom: 1px solid #000 !important;
+                background: transparent !important;
+            }
+            .tab-content {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- WIDGET TANGGAL DAN JAM REAL-TIME -->
+    <div class="header-info">
+        <span id="currentDate">Memuat Tanggal...</span>
+        <span id="currentTime" style="font-weight: bold; font-size: 16px;">00:00:00</span>
+    </div>
+
+    <!-- NAVIGASI TOMBOL MENU -->
+    <div class="nav-tabs">
+        <button class="nav-btn active" onclick="switchTab('formTab', this)">Formulir Laporan</button>
+        <button class="nav-btn" onclick="requestAdminAccess(this)">Dashboard Admin & Rekap</button>
+    </div>
+
+    <!-- TAB 1: FORMULIR LAPORAN UTAMA -->
+    <div id="formTab" class="tab-content active">
+        <h1 class="title">
+            Laporan Sterilisasi <span class="moel-blink">MOEL</span>
+        </h1>
+
+        <form id="laporanForm">
+            <!-- FITUR I: SATKER -->
+            <fieldset>
+                <legend>Fitur I: Informasi Satuan Kerja (SATKER)</legend>
+                <div class="form-group">
+                    <label>Nama Satker</label>
+                    <input type="text" id="satker" required placeholder="Masukkan Nama Satker">
+                </div>
+                <div class="form-group">
+                    <label>Gedung</label>
+                    <input type="text" id="gedung" placeholder="Nama Gedung">
+                </div>
+                <div class="form-group">
+                    <label>Ruangan</label>
+                    <input type="text" id="ruangan" placeholder="Nama Ruangan">
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <label style="font-weight: bold; display: block; margin-bottom: 8px;">Pendamping:</label>
+                <div class="form-group">
+                    <label>Nama</label>
+                    <input type="text" id="pendampingNama" placeholder="Nama Pendamping" oninput="updatePendampingLabel()">
+                </div>
+                <div class="form-group">
+                    <label>Pangkat</label>
+                    <input type="text" id="pendampingPangkat" placeholder="Pangkat Pendamping">
+                </div>
+                <div class="form-group">
+                    <label>Jabatan</label>
+                    <input type="text" id="pendampingJabatan" placeholder="Jabatan Pendamping">
+                </div>
+            </fieldset>
+
+            <!-- FITUR II: PETUGAS (8 KOLOM) -->
+            <fieldset>
+                <legend>Fitur II: Data Petugas (8 Orang)</legend>
+                <div class="petugas-grid">
+                    <div class="form-group"><label style="width:70px;">1.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 1" oninput="updatePetugasPertama()"></div>
+                    <div class="form-group"><label style="width:70px;">2.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 2"></div>
+                    <div class="form-group"><label style="width:70px;">3.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 3"></div>
+                    <div class="form-group"><label style="width:70px;">4.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 4"></div>
+                    <div class="form-group"><label style="width:70px;">5.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 5"></div>
+                    <div class="form-group"><label style="width:70px;">6.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 6"></div>
+                    <div class="form-group"><label style="width:70px;">7.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 7"></div>
+                    <div class="form-group"><label style="width:70px;">8.</label><input type="text" class="petugas-input" placeholder="Nama Petugas 8"></div>
+                </div>
+            </fieldset>
+
+            <!-- FITUR III: ALAT YANG DIGUNAKAN -->
+            <fieldset>
+                <legend>Fitur III: Alat yang Digunakan</legend>
+                <div class="alat-section">
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px;">Counter Surveillance:</label>
+                        <div class="checkbox-group"><input type="checkbox" value="Oscor Green"> 1. Oscor Green</div>
+                        <div class="checkbox-group"><input type="checkbox" value="Hawk"> 2. Hawk</div>
+                        <div class="checkbox-group"><input type="checkbox"> 3. <input type="text" placeholder="Input Alat 3" style="padding: 4px; margin-left: 5px;"></div>
+                        <div class="checkbox-group"><input type="checkbox"> 4. <input type="text" placeholder="Input Alat 4" style="padding: 4px; margin-left: 5px;"></div>
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px;">Alat Jammer:</label>
+                        <div class="checkbox-group"><input type="checkbox" value="Jammer GSM"> Jammer GSM</div>
+                        <div class="checkbox-group"><input type="checkbox" value="Jammer WiFi"> Jammer WiFi</div>
+                        <div class="checkbox-group"><input type="checkbox" value="Jammer Drone"> Jammer Drone</div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- WAKTU & NOTIFIKASI -->
+            <fieldset>
+                <legend>Waktu & Catatan</legend>
+                <div class="form-group">
+                    <label>Waktu Mulai</label>
+                    <input type="text" id="waktuMulai" placeholder="YYYY-MM-DD HH:MM">
+                    <button type="button" class="time-btn" onclick="setAutoTime('waktuMulai')">Auto</button>
+                </div>
+                <div class="form-group">
+                    <label>Waktu Selesai</label>
+                    <input type="text" id="waktuSelesai" placeholder="YYYY-MM-DD HH:MM">
+                    <button type="button" class="time-btn" onclick="setAutoTime('waktuSelesai')">Auto</button>
+                </div>
+                <div class="form-group" style="align-items: flex-start;">
+                    <label>Notifikasi (Maks 200 Karakter)</label>
+                    <textarea id="notifikasi" maxlength="200" rows="3" placeholder="Masukkan catatan atau notifikasi (maksimal 200 karakter)..."></textarea>
+                </div>
+            </fieldset>
+
+            <!-- AREA TANDA TANGAN -->
+            <div class="signature-container">
+                <div class="signature-box">
+                    <p>Petugas</p>
+                    <div class="canvas-wrapper">
+                        <canvas id="padPetugas"></canvas>
+                    </div>
+                    <button type="button" class="clear-btn" onclick="signaturePadPetugas.clear()">Hapus TTD</button>
+                    <p id="labelNamaPetugas" style="margin-top: 10px; font-weight: normal; font-size: 13px;">(Nama Petugas 1)</p>
+                </div>
+
+                <div class="signature-box">
+                    <p>Pendamping</p>
+                    <div class="canvas-wrapper">
+                        <canvas id="padPendamping"></canvas>
+                    </div>
+                    <button type="button" class="clear-btn" onclick="signaturePadPendamping.clear()">Hapus TTD</button>
+                    <p id="labelNamaPendamping" style="margin-top: 10px; font-weight: normal; font-size: 13px;">(Nama Pendamping)</p>
+                </div>
+            </div>
+
+            <!-- TOMBOL AKSI: KIRIM/OK & PRINT/SAVE PDF -->
+            <div class="action-buttons">
+                <button type="button" class="btn-main btn-submit" onclick="submitLaporan()">✔️ Kirim / OK</button>
+                <button type="button" class="btn-main" onclick="window.print()">🖨️ Print / Save PDF</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- TAB 2: DASHBOARD ADMIN & REKAP -->
+    <div id="adminTab" class="tab-content">
+        <h1 class="title">Dashboard Admin - Rekap Laporan Sterilisasi <span class="moel-blink">MOEL</span></h1>
+
+        <div class="dashboard-header">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari Nama Satker/Gedung..." onkeyup="filterTable()">
+            </div>
+            <div>
+                <button class="nav-btn" style="background-color: #00b894;" onclick="window.print()">🖨️ Cetak Rekap PDF</button>
+            </div>
+        </div>
+
+        <table class="rekap-table" id="rekapTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Waktu Mulai</th>
+                    <th>Nama Satker</th>
+                    <th>Gedung / Ruangan</th>
+                    <th>Petugas Utama</th>
+                    <th>Pendamping</th>
+                    <th class="no-print">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="rekapTableBody">
+                <!-- Data Laporan Masuk Akan Ditampilkan Disini Secara Otomatis -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // 1. TAMPILKAN TANGGAL DAN JAM REAL-TIME
+    function updateDateTime() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+        
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // 2. PROTEKSI PASSWORD ADMIN
+    function requestAdminAccess(btnElement) {
+        const passwordInput = prompt("Masukkan Password Admin:");
+        if (passwordInput === "admin123") {
+            switchTab('adminTab', btnElement);
+        } else if (passwordInput !== null) {
+            alert("Password Salah! Akses ditolak.");
+        }
+    }
+
+    // Fungsi Berpindah Tab
+    function switchTab(tabId, btnElement) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        btnElement.classList.add('active');
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    // Inisialisasi Signature Pad
+    let canvasPetugas = document.getElementById('padPetugas');
+    let canvasPendamping = document.getElementById('padPendamping');
+    
+    let signaturePadPetugas = new SignaturePad(canvasPetugas);
+    let signaturePadPendamping = new SignaturePad(canvasPendamping);
+
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        [canvasPetugas, canvasPendamping].forEach(canvas => {
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+        });
+        signaturePadPetugas.clear();
+        signaturePadPendamping.clear();
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Fungsi Waktu Otomatis
+    function setAutoTime(elementId) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        document.getElementById(elementId).value = `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    // Sinkronisasi Nama Petugas & Pendamping ke Tanda Tangan
+    function updatePetugasPertama() {
+        const val = document.querySelector('.petugas-input').value;
+        document.getElementById('labelNamaPetugas').textContent = val ? val : "(Nama Petugas 1)";
+    }
+
+    function updatePendampingLabel() {
+        const val = document.getElementById('pendampingNama').value;
+        document.getElementById('labelNamaPendamping').textContent = val ? val : "(Nama Pendamping)";
+    }
+
+    // 3. FUNGSI KIRIM/OK & DETAIL HANYA KOLOM NOTIFIKASI
+    let laporanDataList = [];
+
+    function submitLaporan() {
+        const satker = document.getElementById('satker').value;
+        const gedung = document.getElementById('gedung').value;
+        const ruangan = document.getElementById('ruangan').value;
+        const waktuMulai = document.getElementById('waktuMulai').value;
+        const petugasPertama = document.querySelector('.petugas-input').value || "(Tidak diisi)";
+        const pendampingNama = document.getElementById('pendampingNama').value || "(Tidak diisi)";
+        const notifikasi = document.getElementById('notifikasi').value || "(Tidak ada catatan / notifikasi)";
+
+        if (!satker) {
+            alert("Harap isi Nama Satker terlebih dahulu!");
+            document.getElementById('satker').focus();
+            return;
+        }
+
+        const newData = {
+            waktu: waktuMulai ? waktuMulai : "-",
+            satker: satker,
+            lokasi: `${gedung} / ${ruangan}`,
+            petugas: petugasPertama,
+            pendamping: pendampingNama,
+            notifikasi: notifikasi // Menyimpan isi notifikasi
+        };
+
+        laporanDataList.push(newData);
+        renderTable();
+
+        alert("Laporan berhasil dikirim dan masuk ke Dashboard Admin!");
+        
+        document.getElementById('laporanForm').reset();
+        signaturePadPetugas.clear();
+        signaturePadPendamping.clear();
+        document.getElementById('labelNamaPetugas').textContent = "(Nama Petugas 1)";
+        document.getElementById('labelNamaPendamping').textContent = "(Nama Pendamping)";
+    }
+
+    // Render Tabel Rekap Admin
+    function renderTable() {
+        const tbody = document.getElementById('rekapTableBody');
+        tbody.innerHTML = "";
+
+        laporanDataList.forEach((item, index) => {
+            let row = `<tr>
+                <td>${index + 1}</td>
+                <td>${item.waktu}</td>
+                <td>${item.satker}</td>
+                <td>${item.lokasi}</td>
+                <td>${item.petugas}</td>
+                <td>${item.pendamping}</td>
+                <td class="no-print">
+                    <div class="action-btns">
+                        <button class="btn-sm btn-view" onclick="showDetail(${index})">Detail</button>
+                        <button class="btn-sm btn-delete" onclick="deleteRow(${index})">Hapus</button>
+                    </div>
+                </td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Memunculkan Pop-up HANYA Berisi Isi Kolom Notifikasi
+    function showDetail(index) {
+        const item = laporanDataList[index];
+        alert(`Isi Notifikasi / Catatan (${item.satker}):\n\n` + item.notifikasi);
+    }
+
+    // Hapus baris data
+    function deleteRow(index) {
+        if (confirm("Yakin ingin menghapus laporan ini dari rekap?")) {
+            laporanDataList.splice(index, 1);
+            renderTable();
+        }
+    }
+
+    // Filter / Pencarian Tabel Admin
+    function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toLowerCase();
+        const tr = document.getElementById("rekapTable").getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let tdSatker = tr[i].getElementsByTagName("td")[2];
+            let tdGedung = tr[i].getElementsByTagName("td")[3];
+            
+            if (tdSatker || tdGedung) {
+                let textSatker = tdSatker.textContent || tdSatker.innerText;
+                let textGedung = tdGedung.textContent || tdGedung.innerText;
+                
+                if (textSatker.toLowerCase().indexOf(filter) > -1 || textGedung.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
